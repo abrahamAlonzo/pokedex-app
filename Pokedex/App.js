@@ -15,6 +15,7 @@ import {
   Text,
   StatusBar,
 } from 'react-native';
+import { Provider } from 'react-redux';
 
 import {
   Header,
@@ -24,9 +25,13 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const App: () => React$Node = () => {
+// Imports: Redux Store
+import { store } from './src/redux/store';
+import { connect } from 'react-redux';
+
+const App: (props) => React$Node = (props) => {
   return (
-    <>
+    <Provider store={store}>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView>
         <ScrollView
@@ -40,36 +45,40 @@ const App: () => React$Node = () => {
           )}
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
+              <Text style={styles.sectionTitle}>{props.counter}</Text>
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
           </View>
         </ScrollView>
       </SafeAreaView>
-    </>
+    </Provider>
   );
+};
+
+  
+// Map State To Props (Redux Store Passes State To Component)
+const mapStateToProps = (state) => {
+  console.log('State:');
+  console.log(state);
+  // Redux Store --> Component
+  return {
+    counter: state.counter.counter,
+  };
+};
+// Map Dispatch To Props (Dispatch Actions To Reducers. Reducers Then Modify The Data And Assign It To Your Props)
+const mapDispatchToProps = (dispatch) => {
+  // Action
+  return {
+    // Increase Counter
+    reduxIncreaseCounter: () => dispatch({
+      type: 'INCREASE_COUNTER',
+      value: 1,
+    }),
+    // Decrease Counter
+    reduxDecreaseCounter: () => dispatch({
+      type: 'DECREASE_COUNTER',
+      value: 1,
+    }),
+  };
 };
 
 const styles = StyleSheet.create({
@@ -110,5 +119,4 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
-
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
